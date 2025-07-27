@@ -177,8 +177,10 @@ OK
 
 - [Batfish Documentation](https://batfish.readthedocs.io/)
 - [pybatfish GitHub Repository](https://github.com/batfish/pybatfish)
-- [VXLAN Configuration Best Practices](https://www.cisco.com/c/en/us/products/switches/nexus-9000-series-switches/white-paper-c11-729383.html)
-- [BGP EVPN Configuration Guide](https://tools.ietf.org/html/rfc7432)
+- [Cisco Nexus 9000 VXLAN BGP EVPN Design Guide](https://www.cisco.com/c/en/us/td/docs/dcn/whitepapers/cisco-vxlan-bgp-evpn-design-and-implementation-guide.html)
+- [Cisco Nexus 9000 VXLAN Configuration Guide](https://www.cisco.com/c/en/us/td/docs/dcn/nx-os/nexus9000/103x/configuration/vxlan/cisco-nexus-9000-series-nx-os-vxlan-configuration-guide-release-103x.html)
+- [VXLAN EVPN Multi-Site White Paper](https://www.cisco.com/c/en/us/products/collateral/switches/nexus-9000-series-switches/white-paper-c11-739942.html)
+- [BGP EVPN RFC 7432](https://tools.ietf.org/html/rfc7432)
 
 ## Contributing
 
