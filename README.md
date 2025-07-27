@@ -112,6 +112,90 @@ python -m unittest enhanced_test_batfish_vxlan.ComprehensiveBatfishVxlanTest.tes
 python enhanced_test_batfish_vxlan.py -v
 ```
 
+## Test Scripts Comparison
+
+This framework provides two test scripts with different levels of validation depth:
+
+### `test_batfish_vxlan.py` - Basic Validation Suite
+
+**Purpose**: Quick validation of core VXLAN functionality
+**Tests**: 4 basic tests
+**Runtime**: ~10-15 seconds
+
+| Test Method | Description | Validation Level |
+|-------------|-------------|------------------|
+| `test_nve_interface_exists` | Verifies NVE interfaces are configured | Basic presence check |
+| `test_bgp_peers_established` | Checks BGP session compatibility | Basic session validation |
+| `test_vxlan_vni_defined` | Ensures VNI configuration exists | Basic VNI presence |
+| `test_vxlan_ingress_replication_bgp` | Validates BGP ingress replication | Basic protocol check |
+
+**Use Case**: 
+- Quick smoke tests
+- CI/CD pipeline integration
+- Initial configuration validation
+- Development environment testing
+
+### `enhanced_test_batfish_vxlan.py` - Comprehensive Validation Suite
+
+**Purpose**: Deep fabric validation with detailed analysis
+**Tests**: 12 comprehensive tests
+**Runtime**: ~45-60 seconds
+
+| Test Method | Description | Validation Level |
+|-------------|-------------|------------------|
+| `test_fabric_topology_discovery` | Validates all expected nodes present | ✅ Node inventory verification |
+| `test_nve_interface_configuration` | Comprehensive NVE interface validation | ✅ Admin status, per-leaf checks |
+| `test_vxlan_vni_configuration` | Detailed VNI configuration analysis | ✅ VNI presence per leaf |
+| `test_vxlan_ingress_replication_method` | Validates BGP ingress replication | ✅ Protocol method verification |
+| `test_bgp_session_establishment` | BGP session compatibility analysis | ✅ Broken session detection |
+| `test_bgp_evpn_address_family` | BGP EVPN address family validation | ✅ Process configuration check |
+| `test_bgp_route_reflector_configuration` | Route reflector setup validation | ✅ Neighbor count verification |
+| `test_underlay_connectivity` | IP reachability testing | ✅ Loopback-to-loopback paths |
+| `test_vxlan_tunnel_consistency` | Source interface consistency | ✅ Per-node source validation |
+| `test_routing_table_convergence` | Route convergence analysis | ✅ BGP route presence |
+| `test_configuration_compliance` | Configuration quality checks | ✅ Unused/undefined detection |
+| `test_fabric_summary_report` | Comprehensive fabric reporting | ✅ Detailed statistics output |
+
+**Use Case**:
+- Production readiness validation
+- Detailed troubleshooting
+- Change impact assessment
+- Compliance verification
+
+## Feature Comparison Matrix
+
+| Feature | Basic Script | Enhanced Script |
+|---------|--------------|-----------------|
+| **Test Coverage** | 4 tests | 12 tests |
+| **Execution Time** | Fast (~15s) | Comprehensive (~60s) |
+| **Error Details** | Basic assertions | Detailed diagnostics |
+| **Fabric Topology Validation** | ❌ | ✅ |
+| **Per-Node Analysis** | ❌ | ✅ |
+| **Underlay Testing** | ❌ | ✅ |
+| **Route Reflector Validation** | ❌ | ✅ |
+| **Configuration Compliance** | ❌ | ✅ |
+| **Summary Reporting** | ❌ | ✅ |
+| **Pre-Batfish Config Validation** | ❌ | ✅ |
+| **Reachability Testing** | ❌ | ✅ |
+| **Custom Validation Class** | ❌ | ✅ |
+
+## When to Use Which Script
+
+### Use Basic Script (`test_batfish_vxlan.py`) when:
+- ⚡ Quick validation needed
+- 🔄 Running in CI/CD pipelines
+- 🧪 Development environment testing
+- 🎯 Focused on core VXLAN functionality
+- ⏱️ Time constraints exist
+
+### Use Enhanced Script (`enhanced_test_batfish_vxlan.py`) when:
+- 🏭 Production deployment validation
+- 🔍 Detailed troubleshooting required
+- 📊 Comprehensive reporting needed
+- 🛡️ Security/compliance validation
+- 🌐 Full fabric health assessment
+- 📈 Change impact analysis
+
 ## Test Categories
 
 ### 1. Basic Validation (`test_batfish_vxlan.py`)
