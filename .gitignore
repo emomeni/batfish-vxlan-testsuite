@@ -1,0 +1,18 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*.so
+
+# Test and coverage reports
+*.cover
+*.py,cover
+
+# Logs
+*.log
+
+# Local environments
+.env
+venv/
+
+# Misc
+.DS_Store
