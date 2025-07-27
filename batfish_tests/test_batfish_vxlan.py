@@ -31,6 +31,20 @@ class BatfishVxlanTest(unittest.TestCase):
         peers = bfq.bgpSessionCompatibility().answer().frame()
         self.assertFalse(peers.empty, "No BGP peers found in snapshot")
 
+    @unittest.skipUnless(PYBATFISH_AVAILABLE, "pybatfish not available")
+    def test_vxlan_vni_defined(self):
+        """Ensure at least one VXLAN VNI is defined"""
+        vnis = bfq.vxlanVniProperties().answer().frame()
+        self.assertFalse(vnis.empty, "No VXLAN VNIs found in snapshot")
+
+    @unittest.skipUnless(PYBATFISH_AVAILABLE, "pybatfish not available")
+    def test_vxlan_ingress_replication_bgp(self):
+        """Validate that VXLAN uses BGP for ingress replication"""
+        vnis = bfq.vxlanVniProperties().answer().frame()
+        if not vnis.empty and "Ingress_Method" in vnis.columns:
+            self.assertTrue((vnis["Ingress_Method"] == "BGP").all(),
+                            "Ingress replication not set to BGP for all VNIs")
+
 
 if __name__ == '__main__':
     unittest.main()
