@@ -48,8 +48,9 @@ This framework provides automated testing and validation capabilities for VXLAN 
 ## Installation
 
 ### 1. Install Python Dependencies
+Install the required packages using the provided `requirements.txt` file:
 ```bash
-pip install pybatfish pandas
+pip install -r requirements.txt
 ```
 
 ### 2. Start Batfish Server

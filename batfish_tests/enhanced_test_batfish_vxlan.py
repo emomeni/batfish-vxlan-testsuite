@@ -1,7 +1,25 @@
 import os
 import unittest
-import pandas as pd
+import logging
 from typing import Dict, List, Set
+
+try:
+    import pandas as pd
+    PANDAS_AVAILABLE = True
+except ImportError:
+    PANDAS_AVAILABLE = False
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+
+class RequiresPybatfishTestCase(unittest.TestCase):
+    """Base test case that skips tests if pybatfish is unavailable."""
+
+    @classmethod
+    def setUpClass(cls):
+        if not PYBATFISH_AVAILABLE or not PANDAS_AVAILABLE:
+            raise unittest.SkipTest("required dependencies not available")
 
 try:
     from pybatfish.client.session import Session
@@ -12,30 +30,31 @@ except ImportError:
     PYBATFISH_AVAILABLE = False
 
 
-class ComprehensiveBatfishVxlanTest(unittest.TestCase):
+@unittest.skipUnless(PYBATFISH_AVAILABLE, "pybatfish not available")
+class ComprehensiveBatfishVxlanTest(RequiresPybatfishTestCase):
     """Comprehensive VXLAN fabric validation using Batfish"""
     
-    @unittest.skipUnless(PYBATFISH_AVAILABLE, "pybatfish not available")
+    BF_HOST = 'localhost'
+    SNAPSHOT_NAME = 'vxlan_fabric'
+    EXPECTED_ASN = 65001
+
     def setUp(self):
         """Setup Batfish session and snapshot"""
-        self.bf = Session(host='localhost')
-        self.snapshot_name = 'vxlan_fabric'
+        self.bf = Session(host=self.BF_HOST)
         snapshot_path = os.path.join(os.path.dirname(__file__), 'sample_configs')
-        
+
         if os.path.isdir(snapshot_path):
-            self.bf.init_snapshot(snapshot_path, name=self.snapshot_name, overwrite=True)
+            self.bf.init_snapshot(snapshot_path, name=self.SNAPSHOT_NAME, overwrite=True)
         else:
             self.skipTest(f"Snapshot directory {snapshot_path} not found")
-            
-        self.bf.set_snapshot(self.snapshot_name)
+
+        self.bf.set_snapshot(self.SNAPSHOT_NAME)
         
         # Expected fabric topology
         self.expected_leaf_nodes = {'leaf1', 'leaf2'}
         self.expected_spine_nodes = {'spine1'}
         self.expected_vnis = {5001}
-        self.expected_asn = 65001
 
-    @unittest.skipUnless(PYBATFISH_AVAILABLE, "pybatfish not available")
     def test_fabric_topology_discovery(self):
         """Validate that all expected nodes are present in the fabric"""
         nodes = bfq.nodeProperties().answer().frame()
@@ -49,7 +68,6 @@ class ComprehensiveBatfishVxlanTest(unittest.TestCase):
         self.assertEqual(len(missing_spines), 0, 
                         f"Missing spine nodes: {missing_spines}")
 
-    @unittest.skipUnless(PYBATFISH_AVAILABLE, "pybatfish not available")
     def test_nve_interface_configuration(self):
         """Comprehensive NVE interface validation"""
         interfaces = bfq.interfaceProperties(interfaces='/nve.*/').answer().frame()
@@ -68,7 +86,6 @@ class ComprehensiveBatfishVxlanTest(unittest.TestCase):
             self.assertTrue(admin_up, 
                           f"NVE interface on {leaf} is administratively down")
 
-    @unittest.skipUnless(PYBATFISH_AVAILABLE, "pybatfish not available")
     def test_vxlan_vni_configuration(self):
         """Validate VXLAN VNI configuration"""
         vnis = bfq.vxlanVniProperties().answer().frame()
@@ -88,7 +105,6 @@ class ComprehensiveBatfishVxlanTest(unittest.TestCase):
             self.assertFalse(leaf_vnis.empty, 
                            f"No VNIs configured on {leaf}")
 
-    @unittest.skipUnless(PYBATFISH_AVAILABLE, "pybatfish not available")
     def test_vxlan_ingress_replication_method(self):
         """Validate VXLAN ingress replication is set to BGP"""
         vnis = bfq.vxlanVniProperties().answer().frame()
@@ -102,7 +118,6 @@ class ComprehensiveBatfishVxlanTest(unittest.TestCase):
             else:
                 self.skipTest("Ingress replication method information not available")
 
-    @unittest.skipUnless(PYBATFISH_AVAILABLE, "pybatfish not available")
     def test_bgp_session_establishment(self):
         """Validate BGP session compatibility and establishment"""
         bgp_sessions = bfq.bgpSessionCompatibility().answer().frame()
@@ -115,7 +130,6 @@ class ComprehensiveBatfishVxlanTest(unittest.TestCase):
             self.assertTrue(broken_sessions.empty, 
                           f"Broken BGP sessions found: {broken_sessions[['Node', 'Remote_Node']].values.tolist()}")
 
-    @unittest.skipUnless(PYBATFISH_AVAILABLE, "pybatfish not available")
     def test_bgp_evpn_address_family(self):
         """Validate BGP EVPN address family configuration"""
         bgp_process = bfq.bgpProcessConfiguration().answer().frame()
@@ -129,7 +143,6 @@ class ComprehensiveBatfishVxlanTest(unittest.TestCase):
             self.assertFalse(node_bgp.empty, 
                            f"No BGP process found on {node}")
 
-    @unittest.skipUnless(PYBATFISH_AVAILABLE, "pybatfish not available")
     def test_bgp_route_reflector_configuration(self):
         """Validate BGP route reflector setup on spine nodes"""
         bgp_neighbors = bfq.bgpPeerConfiguration().answer().frame()
@@ -144,7 +157,6 @@ class ComprehensiveBatfishVxlanTest(unittest.TestCase):
                 self.assertGreaterEqual(neighbor_count, expected_neighbors,
                                       f"Spine {spine} has {neighbor_count} neighbors, expected at least {expected_neighbors}")
 
-    @unittest.skipUnless(PYBATFISH_AVAILABLE, "pybatfish not available")
     def test_underlay_connectivity(self):
         """Test underlay IP connectivity between nodes"""
         # Get loopback interfaces (typically used as VTEP source)
@@ -173,7 +185,6 @@ class ComprehensiveBatfishVxlanTest(unittest.TestCase):
                                 self.assertTrue(unreachable.empty,
                                               f"Unreachable path from {src_ip} to {dst_ip}")
 
-    @unittest.skipUnless(PYBATFISH_AVAILABLE, "pybatfish not available")  
     def test_vxlan_tunnel_consistency(self):
         """Validate VXLAN tunnel source interface consistency"""
         interfaces = bfq.interfaceProperties(interfaces='/nve.*/').answer().frame()
@@ -192,7 +203,6 @@ class ComprehensiveBatfishVxlanTest(unittest.TestCase):
                         self.assertEqual(unique_sources, 1,
                                        f"Inconsistent VXLAN source addresses on {node}")
 
-    @unittest.skipUnless(PYBATFISH_AVAILABLE, "pybatfish not available")
     def test_routing_table_convergence(self):
         """Validate routing table has converged properly"""
         routes = bfq.routes().answer().frame()
@@ -205,7 +215,6 @@ class ComprehensiveBatfishVxlanTest(unittest.TestCase):
             bgp_routes = routes[routes['Protocol'] == 'bgp']
             self.assertFalse(bgp_routes.empty, "No BGP routes found")
 
-    @unittest.skipUnless(PYBATFISH_AVAILABLE, "pybatfish not available")
     def test_configuration_compliance(self):
         """Run configuration compliance checks"""
         # Check for unused configurations
@@ -216,38 +225,37 @@ class ComprehensiveBatfishVxlanTest(unittest.TestCase):
         
         # Report issues but don't fail the test (warnings)
         if not unused_structs.empty:
-            print(f"Warning: Found {len(unused_structs)} unused configuration structures")
-            
-        if not undefined_refs.empty:
-            print(f"Warning: Found {len(undefined_refs)} undefined references")
+            logger.warning("Found %d unused configuration structures", len(unused_structs))
 
-    @unittest.skipUnless(PYBATFISH_AVAILABLE, "pybatfish not available")
+        if not undefined_refs.empty:
+            logger.warning("Found %d undefined references", len(undefined_refs))
+
     def test_fabric_summary_report(self):
         """Generate a comprehensive fabric summary"""
-        print("\n" + "="*60)
-        print("VXLAN FABRIC VALIDATION SUMMARY")
-        print("="*60)
+        logger.info("\n" + "="*60)
+        logger.info("VXLAN FABRIC VALIDATION SUMMARY")
+        logger.info("="*60)
         
         # Node summary
         nodes = bfq.nodeProperties().answer().frame()
-        print(f"Nodes in fabric: {len(nodes)}")
+        logger.info("Nodes in fabric: %d", len(nodes))
         
         # Interface summary
         interfaces = bfq.interfaceProperties().answer().frame()
         nve_interfaces = interfaces[interfaces['Interface'].str.contains('nve', case=False, na=False)]
-        print(f"NVE interfaces: {len(nve_interfaces)}")
+        logger.info("NVE interfaces: %d", len(nve_interfaces))
         
         # VNI summary
         vnis = bfq.vxlanVniProperties().answer().frame()
-        print(f"Configured VNIs: {len(vnis)}")
+        logger.info("Configured VNIs: %d", len(vnis))
         if not vnis.empty:
-            print(f"VNI list: {sorted(vnis['VNI'].unique().tolist())}")
+            logger.info("VNI list: %s", sorted(vnis['VNI'].unique().tolist()))
         
         # BGP summary
         bgp_sessions = bfq.bgpSessionCompatibility().answer().frame()
-        print(f"BGP sessions: {len(bgp_sessions)}")
+        logger.info("BGP sessions: %d", len(bgp_sessions))
         
-        print("="*60)
+        logger.info("="*60)
 
 
 class VxlanConfigurationValidator:
@@ -290,12 +298,12 @@ if __name__ == '__main__':
     config_issues = validator.validate_config_files(config_dir)
     
     if config_issues:
-        print("Configuration Issues Found:")
+        logger.warning("Configuration Issues Found:")
         for file, issues in config_issues.items():
-            print(f"\n{file}:")
+            logger.warning("\n%s:", file)
             for issue in issues:
-                print(f"  - {issue}")
-        print("\n" + "="*60 + "\n")
+                logger.warning("  - %s", issue)
+        logger.warning("\n" + "="*60 + "\n")
     
     # Run Batfish tests
     unittest.main(verbosity=2)
