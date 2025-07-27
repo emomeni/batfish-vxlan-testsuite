@@ -38,6 +38,7 @@ project-root/
 ├── test_batfish_vxlan.py    # Main test script
 ├── sample_configs/          # Network configuration directory
 │   ├── leaf1.cfg           # Leaf switch configuration
+│   ├── leaf2.cfg           # Additional leaf switch
 │   └── spine1.cfg          # Spine switch configuration
 └── README.md               # This file
 ```
@@ -49,6 +50,9 @@ Contains the leaf switch configuration with:
 - NVE interface configuration
 - VXLAN VNI mapping
 - BGP EVPN neighbor relationships
+
+### leaf2.cfg
+Additional leaf switch configuration mirroring `leaf1.cfg` but with a different router ID.
 
 ### spine1.cfg
 Contains the spine switch configuration with:
@@ -84,6 +88,16 @@ python -m unittest test_batfish_vxlan.BatfishVxlanTest.test_bgp_peers_establishe
 - **Purpose**: Validates BGP EVPN session configuration
 - **Validation**: Analyzes BGP neighbor compatibility
 - **Expected Result**: BGP peers should be properly configured for EVPN
+
+### 3. VXLAN VNI Presence (`test_vxlan_vni_defined`)
+- **Purpose**: Ensures VXLAN VNIs are defined in the fabric
+- **Validation**: Queries VXLAN VNI properties
+- **Expected Result**: At least one VNI should be configured
+
+### 4. Ingress Replication Method (`test_vxlan_ingress_replication_bgp`)
+- **Purpose**: Confirms VNIs use BGP as the ingress replication method
+- **Validation**: Checks the `Ingress_Method` column of VNI properties
+- **Expected Result**: All VNIs should use `BGP` for ingress replication
 
 ## Configuration Requirements
 
