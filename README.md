@@ -103,6 +103,12 @@ Run the enhanced test suite with detailed validation:
 python enhanced_test_batfish_vxlan.py
 ```
 
+### Advanced Testing
+Run the advanced validation suite with additional EVPN checks:
+```bash
+python advanced_batfish_validation.py
+```
+
 ### Running Specific Tests
 ```bash
 python -m unittest enhanced_test_batfish_vxlan.ComprehensiveBatfishVxlanTest.test_fabric_topology_discovery
@@ -115,7 +121,7 @@ python enhanced_test_batfish_vxlan.py -v
 
 ## Test Scripts Comparison
 
-This framework provides two test scripts with different levels of validation depth:
+This framework provides three test scripts with different levels of validation depth:
 
 ### `test_batfish_vxlan.py` - Basic Validation Suite
 
@@ -163,22 +169,36 @@ This framework provides two test scripts with different levels of validation dep
 - Change impact assessment
 - Compliance verification
 
+### `advanced_batfish_validation.py` - Advanced Validation Suite
+
+**Purpose**: Additional EVPN-centric validation tests
+**Tests**: 5 advanced tests
+**Runtime**: ~30 seconds
+
+| Test Method | Description |
+|-------------|-------------|
+| `test_unique_loopback_ips` | Loopback address uniqueness |
+| `test_bgp_asn_consistency` | Consistent ASN across nodes |
+| `test_evpn_mac_routes_advertised` | Presence of EVPN MAC routes |
+| `test_evpn_prefix_routes_advertised` | Presence of EVPN prefix routes |
+| `test_vlan_vni_mapping_consistency` | VLAN to VNI mapping verification |
+
 ## Feature Comparison Matrix
 
-| Feature | Basic Script | Enhanced Script |
-|---------|--------------|-----------------|
-| **Test Coverage** | 4 tests | 12 tests |
-| **Execution Time** | Fast (~15s) | Comprehensive (~60s) |
-| **Error Details** | Basic assertions | Detailed diagnostics |
-| **Fabric Topology Validation** | ❌ | ✅ |
-| **Per-Node Analysis** | ❌ | ✅ |
-| **Underlay Testing** | ❌ | ✅ |
-| **Route Reflector Validation** | ❌ | ✅ |
-| **Configuration Compliance** | ❌ | ✅ |
-| **Summary Reporting** | ❌ | ✅ |
-| **Pre-Batfish Config Validation** | ❌ | ✅ |
-| **Reachability Testing** | ❌ | ✅ |
-| **Custom Validation Class** | ❌ | ✅ |
+| Feature | Basic Script | Enhanced Script | Advanced Script |
+|---------|--------------|-----------------|-----------------|
+| **Test Coverage** | 4 tests | 12 tests | 5 tests |
+| **Execution Time** | Fast (~15s) | Comprehensive (~60s) | Moderate (~30s) |
+| **Error Details** | Basic assertions | Detailed diagnostics | EVPN focused |
+| **Fabric Topology Validation** | ❌ | ✅ | ✅ |
+| **Per-Node Analysis** | ❌ | ✅ | ✅ |
+| **Underlay Testing** | ❌ | ✅ | ❌ |
+| **Route Reflector Validation** | ❌ | ✅ | ❌ |
+| **Configuration Compliance** | ❌ | ✅ | ❌ |
+| **Summary Reporting** | ❌ | ✅ | ❌ |
+| **Pre-Batfish Config Validation** | ❌ | ✅ | ❌ |
+| **Reachability Testing** | ❌ | ✅ | ❌ |
+| **Custom Validation Class** | ❌ | ✅ | ❌ |
 
 ## When to Use Which Script
 
@@ -197,6 +217,11 @@ This framework provides two test scripts with different levels of validation dep
 - 🌐 Full fabric health assessment
 - 📈 Change impact analysis
 
+### Use Advanced Script (`advanced_batfish_validation.py`) when:
+- ✅ EVPN route advertisement validation is required
+- ✅ Loopback and ASN consistency must be enforced
+- 🧪 Pre-production fabric testing
+
 ## Test Categories
 
 ### 1. Basic Validation (`test_batfish_vxlan.py`)
@@ -212,6 +237,12 @@ This framework provides two test scripts with different levels of validation dep
 - Underlay connectivity testing
 - Configuration consistency checks
 - Fabric summary reporting
+
+### 3. Advanced EVPN Validation (`advanced_batfish_validation.py`)
+- Loopback address validation
+- ASN consistency validation
+- EVPN MAC and prefix route checks
+- VLAN to VNI mapping verification
 
 ## Configuration Customization
 
